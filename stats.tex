@@ -131,7 +131,7 @@
 %% your own titlepages if you'd like anyway
 
 %% Setting up title pages, type in the appropriate names here:
-\booktitle{Experimental Design and Statistical Analyses}
+\booktitle{Experimental Design and Statistical Analysis}
 \subtitle{}
 
 \author{William Cruz}%\affil{National Cheng Kung University - Taiwan}
@@ -501,7 +501,7 @@ is obtained. The probability of observing a value of $Z$ as extreme as $-6.14$ w
 \begin{lstlisting}[language=R]
 n1 <- 200745      # sample size of those who received Salk vaccine as treatment
 n2 <- 201229      # sample size of those who received placebo as treatment
-n <- n1 + n2      # Total sample size
+n  <- n1 + n2     # Total sample size
 num_pol1 <- 56    # Number of children who contracted polio and received Salk vaccine
 num_pol2 <- 142   # Number of children who contracted polio and received Placebo
 num_pol  <- num_pol1+num_pol2 # Total number of children who contracted polio
@@ -575,7 +575,7 @@ Totals         & 31&108.9297  &          &         &         &     \\
 \end{table} 
 %\footnotesize{*  Statistically significant with an $\alpha \geq 0.05$}
 %\footnotesize{** Statistically significant with an $\alpha \geq 0.01$}
-
+\
 \begin{lstlisting}[language=R]
 # Power Requirement Data Frame
 library(EMSaov) # Required library
@@ -834,14 +834,13 @@ The \textit{critical region} of a test statistic consist of all values of the te
 
 \subsection{Type I and Type II Errors}
 
-Since hypothesis testing is based on observed sample statistics computed on $n$ observations, the decision is always subject to error. If a null hypothesis that is really true is rejected, a \textit{type I error} has been committed, and its magnitude is denoted as $\alpha$. If the null hypothesis is not true but is not rejected because the sample provides insufficient evidence for such rejection, a \textit{type II error} has been made. The magnitude of that error is denoted $\beta(\mu)$
-
+Since hypothesis testing is based on observed sample statistics computed on $n$ observations, the decision is always subject to error. If a null hypothesis that is really true is rejected, a \textit{type I error} has been committed, and its magnitude is denoted as $\alpha$. If the null hypothesis is not true but is not rejected because the sample provides insufficient evidence for such rejection, a \textit{type II error} has been made. The magnitude of that error is denoted $\beta(\mu)$.
 These $\alpha$ and $\beta$ error probabilities are often referred to as the risks of making incorrect decisions. One of the objectives in hypothesis testing is to design a test for which $\alpha$ is small and $\beta$ is known to be small for at least one value of the parameter at which the experimenter would like rejection to occur. In most such test procedures $\alpha$ is set at some predetermined level.
 
 \subsection{The Classical Approach to Hypothesis Testing}
 
 In many cases, the critical region of the test statistic, based on the accepted magnitude of $\alpha$ is determined before sampling occurs. Then the value of the test statistic is calculated for the values of the obtained sample, and the null hypothesis is rejected when that value is in the critical region. A series of steps applicable to hypotheses and test statistics of most types can be taken when this classical approach is used. The following example illustrate the procedure.
-\\
+\
 \myexample{Classical Approach to Hypothesis Testing}{Suppose the average number of miles per gallon obtained by a certain carburetor is to be at least 19.5 mpg. Further suppose that a customer of the supplier of those carburetors has reason to believe that the average is less than 19.5 mpg. The following parallel steps illustrate one way for the customer to test the hypothesis.
 \\
 \textbf{Steps in Hypothesis Testing}
@@ -881,10 +880,61 @@ In the example of the previous section, $Z = (\bar{Y}-19.5)(2/\sqrt{25}) = (\bar
 In general, the $p$ value of a test is the probability of obtaining a value of the test statistic that is at least as extreme as the calculated value when the null hypothesis is true. It is the smallest significance level at which the null hypothesis can be rejected. Thus, is the agreed-upon valur of $\alpha$ is less than the observed $p$ value the null hypothesis is not rejected.
 
 \section{The Operating Characteristic Curve}
+% Started paraphrasing!
+In the previous example the magnitude of a type II error is denoted as $\beta$, this is the probability of failing to reject $H_0$ when it is not true. Now $H_1$ in that example states that the true average gasoline mileage is less than 19.5 mpg, and there are many means that satisfy this alternative hypothesis. Thus, $\beta$ is a function of $\mu < 19.5$. Lets see how $\beta$ varies with $\mu$ by sketching the distributions of $\bar{Y}$ that these values would generate (assuming that $Y$ is normally distributed and $\sigma = 2$). Additionally note that the critical region for $\bar{Y}$ was established as ${\bar{y}|\bar{y} \leq 18.842 mpg}$.
+From Figure~\ref{fig:ch2_beta_dist} it can be seen that as one considers $\mu$ farther and farther to the left of 19.5, the $\beta$ error decreases.
 
+\begin{figure}
+  \includegraphics[width=0.8\linewidth]{Ch2_beta_dist.eps}
+  \centering
+  \caption{Effect of $\mu$ (mean) on $\beta$ (Type II error)}
+  \label{fig:ch2_beta_dist}
+\end{figure}
+\
+\begin{lstlisting}[language=R]
+# Effect of mean on the Type II error
+par(mfrow=c(3,1)) ; 
+n = 300
+x1 <- rnorm(n,mean = 19.5, sd=0.4)
+h1 <- hist(x1,breaks = 1, xlim = c(17,21),ylim=c(0,700),
+           border = "white",main="",xlab = expression(mu == 19.5),ylab = "") 
+x1fit <- seq(min(x1),max(x1),length=length(x1)) ; abline(v=19.5,lwd=3) ; abline(v=18.842)
+y1fit <- dnorm(x1fit,mean=mean(x1),sd=sd(x1)) ; y1fit <- y1fit*diff(h1$mids[1:2])*n
+lines(x1fit,y1fit,col="blue", lwd=2)
+text(18,150,expression(alpha == 0.05)) ; text(21,100,expression(bar(y)))
+
+x2 <- rnorm(n,mean = 19, sd=0.4)
+h2 <- hist(x2,breaks = 1, xlim = c(17,21),ylim=c(0,700),
+           border = "white",main="",xlab = expression(mu == 19.0),ylab = "") 
+x2fit <- seq(min(x2),max(x2),length=length(x2)) ; abline(v=19.0,lwd=3) ; abline(v=18.842)
+y2fit <- dnorm(x2fit,mean=mean(x2),sd=sd(x2)) ; y2fit <- y2fit*diff(h2$mids[1:2])*n
+lines(x2fit,y2fit,col="blue", lwd=2)
+text(20,600,expression(beta)) ; text(21,100,expression(bar(y)))
+
+x3 <- rnorm(n,mean = 18.5, sd=0.4)
+h3 <- hist(x3,breaks = 1, xlim = c(17,21),ylim=c(0,700),
+           border = "white",main="",xlab = expression(mu == 18.5),ylab = "") 
+x3fit <- seq(min(x3),max(x3),length=length(x3)) ; abline(v=18.5,lwd=3) ; abline(v=18.842)
+y3fit <- dnorm(x3fit,mean=mean(x3),sd=sd(x3)) ; y3fit <- y3fit*diff(h3$mids[1:2])*n
+lines(x3fit,y3fit,col="blue", lwd=2)
+text(19.5,400,expression(beta)) ; text(21,100,expression(bar(y)))
+\end{lstlisting}
+\
+% EXAMPLES
 \begin{equation}
 \alpha
 \end{equation}
+
+\begin{figure}
+  \includegraphics[width=0.2\linewidth]{Ch1_interaction_plot.eps}
+  \centering
+  \caption{$B \times C$ interaction for power requirement example}
+  \label{fig:ch1_interaction}
+\end{figure}
+
+\begin{lstlisting}[language=R]
+hello<-"hola"
+\end{lstlisting}
 
 \chapter[Single-Factor Experiment]{}
 
