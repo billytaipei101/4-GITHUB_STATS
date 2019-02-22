@@ -37,7 +37,7 @@ power_cut <- structure(list(cut = structure(c(rep(2L,16),c(rep(1L,16))),
                        class = "data.frame",
                        row.names = c(NA, -32L))
 
-# ANOVA for the 'Power Requirement Experiment'
+# ANOVA for the 'Power Requirement Experiment' #change!
 Anova_T <- EMSanova(mil_del~tool*bevel*cut,data=power_cut,
                     type=c("F","F","F"),nested=c(NA,NA,NA))
 
